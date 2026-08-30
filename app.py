@@ -1,7 +1,7 @@
 import streamlit as st
 import urllib.parse
 import re
-
+from textwrap import dedent
 
 # =========================================================
 # PAGE CONFIG
@@ -11,9 +11,8 @@ st.set_page_config(
     page_title="EDC Payment Machine Chennai | Merchant Assistance",
     page_icon="💳",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
 )
-
 
 # =========================================================
 # SETTINGS
@@ -22,700 +21,465 @@ st.set_page_config(
 WHATSAPP_NUMBER = "917448326548"
 CALL_NUMBER = "917448326548"
 
-
 # =========================================================
-# CSS
+# GLOBAL CSS
+#
+# IMPORTANT:
+# We use textwrap.dedent() for every HTML/CSS block.
+# Without dedent(), the leading spaces inside Python
+# triple-quoted strings can make Streamlit treat HTML
+# as a Markdown code block and display the HTML literally.
 # =========================================================
 
 st.markdown(
-    """
-<style>
-
-/* =====================================================
-   GLOBAL
-===================================================== */
-
-.stApp {
-    background: #F5F7FB !important;
-}
-
-.block-container {
-    max-width: 1200px;
-    padding-top: 25px;
-    padding-bottom: 100px;
-}
-
-
-/* =====================================================
-   NORMAL TEXT
-===================================================== */
-
-p {
-    color: #374151 !important;
-}
-
-label {
-    color: #111827 !important;
-}
-
-
-/* =====================================================
-   TOP NAV
-===================================================== */
-
-.navbar {
-    width: 100%;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 14px;
-    padding: 15px 22px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-
-    margin-bottom: 25px;
-}
-
-.logo {
-    font-size: 20px;
-    font-weight: 800;
-    color: #111827 !important;
-}
-
-.logo span {
-    color: #4F46E5 !important;
-}
-
-.nav-badge {
-    background: #EEF2FF;
-    color: #4338CA !important;
-    padding: 7px 12px;
-    border-radius: 20px;
-
-    font-size: 12px;
-    font-weight: 700;
-}
-
-
-/* =====================================================
-   HERO
-===================================================== */
-
-.hero {
-    background:
-        linear-gradient(
-            135deg,
-            #111827 0%,
-            #1E1B4B 100%
-        );
-
-    border-radius: 28px;
-
-    padding: 60px 35px;
-
-    text-align: center;
-
-    box-shadow:
-        0 20px 50px rgba(17,24,39,0.18);
-
-    margin-bottom: 25px;
-}
-
-.hero-badge {
-    display: inline-block;
-
-    background: rgba(255,255,255,0.12);
-
-    color: #FFFFFF !important;
-
-    padding: 9px 15px;
-
-    border-radius: 30px;
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-    margin-bottom: 18px;
-}
-
-.hero h1 {
-    color: #FFFFFF !important;
-
-    font-size: clamp(34px, 5vw, 58px);
-
-    line-height: 1.08;
-
-    font-weight: 850;
-
-    letter-spacing: -1px;
-
-    margin-bottom: 18px;
-}
-
-.hero h1 span {
-    color: #A5B4FC !important;
-}
-
-.hero p {
-    color: #D1D5DB !important;
-
-    font-size: 18px;
-
-    max-width: 750px;
-
-    margin: auto;
-
-    line-height: 1.6;
-}
-
-.hero-small {
-    color: #9CA3AF !important;
-
-    font-size: 12px;
-
-    margin-top: 18px;
-}
-
-
-/* =====================================================
-   SECTION
-===================================================== */
-
-.section-title {
-    color: #111827 !important;
-
-    font-size: 32px;
-
-    font-weight: 850;
-
-    margin-top: 20px;
-
-    margin-bottom: 5px;
-}
-
-.section-subtitle {
-    color: #6B7280 !important;
-
-    font-size: 15px;
-
-    margin-bottom: 20px;
-}
-
-
-/* =====================================================
-   FEATURE CARDS
-===================================================== */
-
-.feature-card {
-    background: #FFFFFF;
-
-    border: 1px solid #E5E7EB;
-
-    border-radius: 18px;
-
-    padding: 24px;
-
-    min-height: 175px;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.05);
-}
-
-.feature-icon {
-    font-size: 32px;
-
-    margin-bottom: 10px;
-}
-
-.feature-title {
-    color: #111827 !important;
-
-    font-size: 17px;
-
-    font-weight: 800;
-
-    margin-bottom: 7px;
-}
-
-.feature-text {
-    color: #6B7280 !important;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-}
-
-
-/* =====================================================
-   PRICE SUMMARY
-===================================================== */
-
-.price-box {
-    background: #FFFFFF;
-
-    border: 1px solid #E5E7EB;
-
-    border-radius: 18px;
-
-    padding: 20px;
-
-    text-align: center;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.05);
-}
-
-.price-label {
-    color: #6B7280 !important;
-
-    font-size: 13px;
-
-    font-weight: 600;
-}
-
-.price-value {
-    color: #111827 !important;
-
-    font-size: 30px;
-
-    font-weight: 900;
-
-    margin: 5px 0;
-}
-
-.price-note {
-    color: #4F46E5 !important;
-
-    font-size: 12px;
-
-    font-weight: 700;
-}
-
-
-/* =====================================================
-   PLAN CARDS
-===================================================== */
-
-.plan-card {
-    background: #FFFFFF !important;
-
-    border: 1px solid #D1D5DB;
-
-    border-radius: 22px;
-
-    padding: 30px;
-
-    min-height: 460px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.07);
-
-    color: #111827 !important;
-}
-
-.plan-card.monthly {
-    border: 2px solid #4F46E5;
-
-    box-shadow:
-        0 15px 35px rgba(79,70,229,0.14);
-}
-
-.plan-tag {
-    display: inline-block;
-
-    background: #EEF2FF;
-
-    color: #4338CA !important;
-
-    padding: 6px 11px;
-
-    border-radius: 20px;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-    margin-bottom: 15px;
-}
-
-.plan-title {
-    color: #111827 !important;
-
-    font-size: 25px;
-
-    font-weight: 850;
-
-    margin-bottom: 8px;
-}
-
-.plan-price {
-    color: #111827 !important;
-
-    font-size: 44px;
-
-    font-weight: 900;
-
-    line-height: 1;
-}
-
-.plan-price-note {
-    color: #6B7280 !important;
-
-    font-size: 13px;
-
-    margin-top: 8px;
-}
-
-.plan-line {
-    border-top: 1px solid #E5E7EB;
-
-    margin: 22px 0;
-}
-
-.plan-feature {
-    color: #374151 !important;
-
-    font-size: 15px;
-
-    margin: 14px 0;
-
-    line-height: 1.45;
-}
-
-.plan-feature .green {
-    color: #047857 !important;
-
-    font-weight: 800;
-}
-
-.plan-footnote {
-    color: #6B7280 !important;
-
-    font-size: 11px;
-
-    line-height: 1.5;
-
-    margin-top: 18px;
-}
-
-
-/* =====================================================
-   COMPARISON
-===================================================== */
-
-.compare-card {
-    background: #FFFFFF;
-
-    border-radius: 20px;
-
-    border: 1px solid #E5E7EB;
-
-    overflow-x: auto;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.05);
-}
-
-.compare-table {
-    width: 100%;
-
-    min-width: 650px;
-
-    border-collapse: collapse;
-}
-
-.compare-table th {
-    background: #111827;
-
-    color: #FFFFFF !important;
-
-    padding: 16px;
-
-    text-align: left;
-
-    font-size: 14px;
-}
-
-.compare-table td {
-    color: #374151 !important;
-
-    padding: 15px 16px;
-
-    border-bottom: 1px solid #E5E7EB;
-
-    font-size: 14px;
-}
-
-.compare-table tr:last-child td {
-    border-bottom: none;
-}
-
-
-/* =====================================================
-   CALCULATOR
-===================================================== */
-
-.calculator {
-    background: #FFFFFF;
-
-    border: 1px solid #E5E7EB;
-
-    border-radius: 22px;
-
-    padding: 30px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.06);
-}
-
-.result-green {
-    background: #ECFDF5;
-
-    border: 1px solid #A7F3D0;
-
-    border-radius: 14px;
-
-    padding: 20px;
-
-    color: #065F46 !important;
-
-    font-weight: 750;
-
-    line-height: 1.5;
-}
-
-.result-orange {
-    background: #FFF7ED;
-
-    border: 1px solid #FED7AA;
-
-    border-radius: 14px;
-
-    padding: 20px;
-
-    color: #9A3412 !important;
-
-    font-weight: 750;
-
-    line-height: 1.5;
-}
-
-
-/* =====================================================
-   AREA
-===================================================== */
-
-.area-container {
-    background: #FFFFFF;
-
-    border: 1px solid #E5E7EB;
-
-    border-radius: 20px;
-
-    padding: 25px;
-
-    text-align: center;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.05);
-}
-
-.area-pill {
-    display: inline-block;
-
-    background: #F3F4F6;
-
-    border: 1px solid #E5E7EB;
-
-    color: #374151 !important;
-
-    padding: 9px 14px;
-
-    border-radius: 30px;
-
-    margin: 4px;
-
-    font-size: 13px;
-
-    font-weight: 650;
-}
-
-
-/* =====================================================
-   LEAD SECTION
-===================================================== */
-
-.lead-info {
-    background:
-        linear-gradient(
-            135deg,
-            #111827,
-            #312E81
-        );
-
-    border-radius: 22px;
-
-    padding: 35px;
-
-    min-height: 100%;
-
-    box-shadow:
-        0 15px 35px rgba(17,24,39,0.15);
-}
-
-.lead-info h2 {
-    color: #FFFFFF !important;
-
-    font-size: 30px;
-
-    margin-bottom: 12px;
-}
-
-.lead-info p {
-    color: #D1D5DB !important;
-
-    line-height: 1.6;
-}
-
-.lead-point {
-    color: #FFFFFF !important;
-
-    margin: 15px 0;
-
-    font-size: 14px;
-}
-
-
-/* =====================================================
-   FAQ
-===================================================== */
-
-.faq {
-    background: #FFFFFF;
-
-    border: 1px solid #E5E7EB;
-
-    border-radius: 15px;
-
-    padding: 18px 20px;
-
-    margin-bottom: 10px;
-
-    box-shadow:
-        0 4px 15px rgba(0,0,0,0.03);
-}
-
-.faq-question {
-    color: #111827 !important;
-
-    font-weight: 800;
-
-    font-size: 15px;
-
-    margin-bottom: 6px;
-}
-
-.faq-answer {
-    color: #6B7280 !important;
-
-    font-size: 14px;
-
-    line-height: 1.55;
-}
-
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.footer {
-    text-align: center;
-
-    color: #6B7280 !important;
-
-    font-size: 11px;
-
-    line-height: 1.6;
-
-    padding: 30px 10px;
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width:700px) {
+    dedent("""
+    <style>
+
+    .stApp {
+        background: #F5F7FB !important;
+    }
+
+    [data-testid="stHeader"] {
+        background: transparent !important;
+    }
 
     .block-container {
-        padding-left: 12px;
-        padding-right: 12px;
+        max-width: 1180px;
+        padding-top: 22px;
+        padding-bottom: 90px;
     }
 
+    h1, h2, h3, h4 {
+        color: #111827 !important;
+    }
+
+    p, label {
+        color: #374151 !important;
+    }
+
+    /* TOP BAR */
+    .navbar {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 15px;
+        padding: 14px 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 5px 18px rgba(0,0,0,.05);
+    }
+
+    .brand {
+        font-size: 20px;
+        font-weight: 850;
+        color: #111827 !important;
+    }
+
+    .brand-accent {
+        color: #4F46E5 !important;
+    }
+
+    .nav-badge {
+        display: inline-block;
+        background: #EEF2FF;
+        color: #4338CA !important;
+        padding: 7px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    /* HERO */
     .hero {
-        padding: 42px 20px;
-        border-radius: 22px;
+        background: linear-gradient(135deg, #111827 0%, #312E81 100%);
+        border-radius: 28px;
+        padding: 58px 30px 48px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(17,24,39,.18);
+        margin-bottom: 22px;
     }
 
-    .hero h1 {
-        font-size: 36px;
+    .hero-badge {
+        display: inline-block;
+        background: rgba(255,255,255,.12);
+        color: #FFFFFF !important;
+        padding: 8px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 17px;
     }
 
-    .hero p {
-        font-size: 16px;
+    .hero-title {
+        color: #FFFFFF !important;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.08;
+        font-weight: 900;
+        letter-spacing: -1.4px;
+        margin: 0 auto 17px;
+        max-width: 900px;
     }
 
+    .hero-title span {
+        color: #A5B4FC !important;
+    }
+
+    .hero-text {
+        color: #D1D5DB !important;
+        max-width: 760px;
+        margin: 0 auto;
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    .hero-note {
+        color: #9CA3AF !important;
+        margin-top: 17px;
+        font-size: 12px;
+    }
+
+    /* PRICE BOX */
+    .price-box {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 18px;
+        padding: 20px 15px;
+        text-align: center;
+        min-height: 125px;
+        box-shadow: 0 7px 22px rgba(0,0,0,.05);
+    }
+
+    .price-label {
+        color: #6B7280 !important;
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: .4px;
+    }
+
+    .price-value {
+        color: #111827 !important;
+        font-size: 29px;
+        font-weight: 900;
+        margin: 6px 0;
+    }
+
+    .price-note {
+        color: #4F46E5 !important;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    /* SECTION */
     .section-title {
-        font-size: 27px;
+        color: #111827 !important;
+        font-size: 31px;
+        font-weight: 900;
+        margin-top: 15px;
+        margin-bottom: 5px;
     }
 
-    .plan-card {
-        min-height: auto;
-
-        padding: 24px;
-
-        margin-bottom: 15px;
-    }
-
-    .plan-price {
-        font-size: 38px;
-    }
-
-    .lead-info {
+    .section-subtitle {
+        color: #6B7280 !important;
+        font-size: 15px;
         margin-bottom: 20px;
     }
 
-}
+    /* FEATURE CARD */
+    .feature-card {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 18px;
+        padding: 23px;
+        min-height: 175px;
+        box-shadow: 0 7px 22px rgba(0,0,0,.045);
+    }
 
-</style>
-""",
-    unsafe_allow_html=True
+    .feature-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .feature-title {
+        color: #111827 !important;
+        font-size: 17px;
+        font-weight: 850;
+        margin-bottom: 7px;
+    }
+
+    .feature-text {
+        color: #6B7280 !important;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* PLAN CARD */
+    .plan-card {
+        background: #FFFFFF !important;
+        border: 1px solid #D1D5DB;
+        border-radius: 22px;
+        padding: 30px;
+        min-height: 445px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.07);
+    }
+
+    .plan-card.featured {
+        border: 2px solid #4F46E5;
+        box-shadow: 0 15px 38px rgba(79,70,229,.15);
+    }
+
+    .plan-tag {
+        display: inline-block;
+        background: #EEF2FF;
+        color: #4338CA !important;
+        padding: 6px 11px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 850;
+        margin-bottom: 14px;
+    }
+
+    .plan-title {
+        color: #111827 !important;
+        font-size: 25px;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .plan-price {
+        color: #111827 !important;
+        font-size: 44px;
+        line-height: 1;
+        font-weight: 950;
+    }
+
+    .plan-note {
+        color: #6B7280 !important;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+
+    .plan-line {
+        border-top: 1px solid #E5E7EB;
+        margin: 22px 0;
+    }
+
+    .plan-feature {
+        color: #374151 !important;
+        font-size: 15px;
+        margin: 13px 0;
+        line-height: 1.45;
+    }
+
+    .green {
+        color: #047857 !important;
+        font-weight: 850;
+    }
+
+    .plan-footnote {
+        color: #6B7280 !important;
+        font-size: 11px;
+        line-height: 1.5;
+        margin-top: 17px;
+    }
+
+    /* COMPARISON */
+    .compare-wrap {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 20px;
+        overflow-x: auto;
+        box-shadow: 0 8px 25px rgba(0,0,0,.05);
+    }
+
+    .compare-table {
+        width: 100%;
+        min-width: 650px;
+        border-collapse: collapse;
+    }
+
+    .compare-table th {
+        background: #111827;
+        color: #FFFFFF !important;
+        padding: 16px;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .compare-table td {
+        color: #374151 !important;
+        padding: 15px 16px;
+        border-bottom: 1px solid #E5E7EB;
+        font-size: 14px;
+    }
+
+    .compare-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* CALCULATOR */
+    .calculator {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 22px;
+        padding: 27px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    }
+
+    .result-green {
+        background: #ECFDF5;
+        border: 1px solid #A7F3D0;
+        border-radius: 14px;
+        padding: 19px;
+        color: #065F46 !important;
+        font-weight: 750;
+        line-height: 1.5;
+    }
+
+    .result-orange {
+        background: #FFF7ED;
+        border: 1px solid #FED7AA;
+        border-radius: 14px;
+        padding: 19px;
+        color: #9A3412 !important;
+        font-weight: 750;
+        line-height: 1.5;
+    }
+
+    /* AREAS */
+    .area-container {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 20px;
+        padding: 24px;
+        text-align: center;
+        box-shadow: 0 7px 22px rgba(0,0,0,.045);
+    }
+
+    .area-pill {
+        display: inline-block;
+        background: #F3F4F6;
+        border: 1px solid #E5E7EB;
+        color: #374151 !important;
+        padding: 9px 13px;
+        border-radius: 30px;
+        margin: 4px;
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+    /* LEAD */
+    .lead-info {
+        background: linear-gradient(135deg, #111827, #312E81);
+        border-radius: 22px;
+        padding: 32px;
+        min-height: 100%;
+        box-shadow: 0 15px 35px rgba(17,24,39,.15);
+    }
+
+    .lead-info h2 {
+        color: #FFFFFF !important;
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    .lead-info p {
+        color: #D1D5DB !important;
+        line-height: 1.6;
+    }
+
+    .lead-point {
+        color: #FFFFFF !important;
+        margin: 14px 0;
+        font-size: 14px;
+    }
+
+    /* FAQ */
+    .faq {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 15px;
+        padding: 18px 20px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,.03);
+    }
+
+    .faq-question {
+        color: #111827 !important;
+        font-weight: 850;
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .faq-answer {
+        color: #6B7280 !important;
+        font-size: 14px;
+        line-height: 1.55;
+    }
+
+    /* FOOTER */
+    .footer {
+        text-align: center;
+        color: #6B7280 !important;
+        font-size: 11px;
+        line-height: 1.6;
+        padding: 30px 10px 10px;
+    }
+
+    @media(max-width:700px) {
+        .block-container {
+            padding-left: 12px;
+            padding-right: 12px;
+            padding-bottom: 80px;
+        }
+
+        .hero {
+            padding: 42px 20px;
+            border-radius: 22px;
+        }
+
+        .hero-title {
+            font-size: 36px;
+        }
+
+        .hero-text {
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 27px;
+        }
+
+        .plan-card {
+            min-height: auto;
+            padding: 24px;
+            margin-bottom: 15px;
+        }
+
+        .plan-price {
+            font-size: 38px;
+        }
+    }
+
+    </style>
+    """),
+    unsafe_allow_html=True,
 )
 
 
 # =========================================================
-# TOP NAV
+# TOP BAR
 # =========================================================
 
 st.markdown(
-    """
-<div class="navbar">
-
-    <div class="logo">
-        EDC <span>Merchant Assistance</span>
+    dedent("""
+    <div class="navbar">
+        <div class="brand">
+            EDC <span class="brand-accent">Merchant Assistance</span>
+        </div>
+        <div class="nav-badge">
+            Chennai Merchant Enquiries
+        </div>
     </div>
-
-    <div class="nav-badge">
-        Chennai Merchant Enquiries
-    </div>
-
-</div>
-""",
-    unsafe_allow_html=True
+    """),
+    unsafe_allow_html=True,
 )
 
 
@@ -724,32 +488,31 @@ st.markdown(
 # =========================================================
 
 st.markdown(
-    """
-<div class="hero">
+    dedent("""
+    <div class="hero">
 
-    <div class="hero-badge">
-        💳 PAYMENT SOLUTION FOR BUSINESSES
+        <div class="hero-badge">
+            💳 PAYMENT SOLUTION FOR BUSINESSES
+        </div>
+
+        <div class="hero-title">
+            Get an <span>EDC Payment Machine</span>
+            for Your Business
+        </div>
+
+        <div class="hero-text">
+            Explore EDC plan options for your business
+            and request assistance from a merchant representative
+            across Chennai.
+        </div>
+
+        <div class="hero-note">
+            Transparent plan information • Quick enquiry • Chennai assistance
+        </div>
+
     </div>
-
-    <h1>
-        Get an
-        <span>EDC Payment Machine</span>
-        for Your Business
-    </h1>
-
-    <p>
-        Explore EDC plan options for your business
-        and request assistance from a merchant representative
-        across Chennai.
-    </p>
-
-    <div class="hero-small">
-        Transparent plan information • Quick enquiry • Chennai assistance
-    </div>
-
-</div>
-""",
-    unsafe_allow_html=True
+    """),
+    unsafe_allow_html=True,
 )
 
 
@@ -760,74 +523,39 @@ st.markdown(
 price1, price2, price3 = st.columns(3)
 
 with price1:
-
     st.markdown(
-        """
+        dedent("""
         <div class="price-box">
-
-            <div class="price-label">
-                ANNUAL PLAN
-            </div>
-
-            <div class="price-value">
-                ₹4,128
-            </div>
-
-            <div class="price-note">
-                Including GST
-            </div>
-
+            <div class="price-label">ANNUAL PLAN</div>
+            <div class="price-value">₹4,128</div>
+            <div class="price-note">Including GST</div>
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
-
 
 with price2:
-
     st.markdown(
-        """
+        dedent("""
         <div class="price-box">
-
-            <div class="price-label">
-                MONTHLY PLAN
-            </div>
-
-            <div class="price-value">
-                ₹1,528
-            </div>
-
-            <div class="price-note">
-                Including GST
-            </div>
-
+            <div class="price-label">MONTHLY PLAN</div>
+            <div class="price-value">₹1,528</div>
+            <div class="price-note">Including GST</div>
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
 
-
 with price3:
-
     st.markdown(
-        """
+        dedent("""
         <div class="price-box">
-
-            <div class="price-label">
-                MONTHLY RENTAL CONDITION
-            </div>
-
-            <div class="price-value">
-                ₹2 LAKH*
-            </div>
-
-            <div class="price-note">
-                Monthly transaction threshold
-            </div>
-
+            <div class="price-label">MONTHLY RENTAL CONDITION</div>
+            <div class="price-value">₹2 LAKH*</div>
+            <div class="price-note">Monthly transaction threshold</div>
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
 
 
@@ -835,38 +563,35 @@ st.write("")
 
 
 # =========================================================
-# CTA
+# HERO CTA
 # =========================================================
 
 cta1, cta2 = st.columns(2)
 
 with cta1:
-
     if st.button(
         "🚀 GET EDC MACHINE",
         type="primary",
-        use_container_width=True
+        use_container_width=True,
     ):
-
         st.session_state["lead_clicked"] = True
-
+        st.toast("Please fill in the enquiry form below.", icon="📲")
 
 with cta2:
-
-    message = (
+    quick_message = (
         "Hi, I am interested in getting an EDC machine "
         "for my business in Chennai. Please share the details."
     )
 
-    whatsapp_url = (
+    quick_whatsapp = (
         f"https://wa.me/{WHATSAPP_NUMBER}"
-        f"?text={urllib.parse.quote(message)}"
+        f"?text={urllib.parse.quote(quick_message)}"
     )
 
     st.link_button(
         "💬 WHATSAPP ENQUIRY",
-        whatsapp_url,
-        use_container_width=True
+        quick_whatsapp,
+        use_container_width=True,
     )
 
 
@@ -874,66 +599,52 @@ st.divider()
 
 
 # =========================================================
-# BENEFITS
+# FEATURES
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    Why businesses choose an EDC machine
-</div>
+    dedent("""
+    <div class="section-title">
+        Why businesses choose an EDC machine
+    </div>
 
-<div class="section-subtitle">
-    A simple payment solution for everyday merchant needs.
-</div>
-""",
-    unsafe_allow_html=True
+    <div class="section-subtitle">
+        A simple payment solution for everyday merchant needs.
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
-f1, f2, f3, f4 = st.columns(4)
-
-
-feature_data = [
-
+features = [
     (
         "💳",
         "Accept Card Payments",
         "Give your customers another convenient way to pay."
     ),
-
     (
         "⚡",
         "Easy Checkout",
         "Make the payment experience simple and convenient."
     ),
-
     (
         "🧾",
         "Paper Roll Benefit",
         "Lifetime paper roll benefit as per applicable terms."
     ),
-
     (
         "📊",
         "Flexible Plans",
         "Compare annual and monthly options for your business."
-    )
-
+    ),
 ]
 
+feature_cols = st.columns(4)
 
-for column, data in zip(
-    [f1, f2, f3, f4],
-    feature_data
-):
-
-    icon, title, description = data
-
-    with column:
-
+for col, (icon, title, description) in zip(feature_cols, features):
+    with col:
         st.markdown(
-            f"""
+            dedent(f"""
             <div class="feature-card">
 
                 <div class="feature-icon">
@@ -949,8 +660,8 @@ for column, data in zip(
                 </div>
 
             </div>
-            """,
-            unsafe_allow_html=True
+            """),
+            unsafe_allow_html=True,
         )
 
 
@@ -962,30 +673,25 @@ st.divider()
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    Choose your plan
-</div>
+    dedent("""
+    <div class="section-title">
+        Choose your plan
+    </div>
 
-<div class="section-subtitle">
-    Compare the two available plan structures.
-</div>
-""",
-    unsafe_allow_html=True
+    <div class="section-subtitle">
+        Compare the two available plan structures.
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
 annual_col, monthly_col = st.columns(2)
 
 
-# =========================================================
-# ANNUAL
-# =========================================================
-
 with annual_col:
-
     st.markdown(
-        """
+        dedent("""
         <div class="plan-card">
 
             <div class="plan-tag">
@@ -1000,7 +706,7 @@ with annual_col:
                 ₹4,128
             </div>
 
-            <div class="plan-price-note">
+            <div class="plan-note">
                 ₹3,499 + GST • Total including GST
             </div>
 
@@ -1032,20 +738,15 @@ with annual_col:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
 
 
-# =========================================================
-# MONTHLY
-# =========================================================
-
 with monthly_col:
-
     st.markdown(
-        """
-        <div class="plan-card monthly">
+        dedent("""
+        <div class="plan-card featured">
 
             <div class="plan-tag">
                 🔥 LOWER UPFRONT COST
@@ -1059,7 +760,7 @@ with monthly_col:
                 ₹1,528
             </div>
 
-            <div class="plan-price-note">
+            <div class="plan-note">
                 ₹1,300 + GST • Total including GST
             </div>
 
@@ -1070,9 +771,7 @@ with monthly_col:
             </div>
 
             <div class="plan-feature">
-                ✔ <span class="green">
-                    ₹2 lakh monthly transaction target
-                </span>
+                ✔ <span class="green">₹2 lakh monthly transaction target</span>
                 for the stated rental-waiver condition*
             </div>
 
@@ -1089,14 +788,13 @@ with monthly_col:
             </div>
 
             <div class="plan-footnote">
-                *Rental waiver and commercial terms
-                are subject to applicable eligibility
-                and merchant agreement.
+                *Rental waiver and commercial terms are subject
+                to applicable eligibility and merchant agreement.
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
 
 
@@ -1108,78 +806,72 @@ st.divider()
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    Annual vs Monthly
-</div>
+    dedent("""
+    <div class="section-title">
+        Annual vs Monthly
+    </div>
 
-<div class="section-subtitle">
-    Quick comparison of the key plan details.
-</div>
-""",
-    unsafe_allow_html=True
-)
+    <div class="section-subtitle">
+        Quick comparison of the key plan details.
+    </div>
 
+    <div class="compare-wrap">
 
-st.markdown(
-    """
-<div class="compare-card">
+        <table class="compare-table">
 
-<table class="compare-table">
+            <tr>
+                <th>Feature</th>
+                <th>Annual Plan</th>
+                <th>Monthly Plan</th>
+            </tr>
 
-<tr>
-    <th>Feature</th>
-    <th>Annual Plan</th>
-    <th>Monthly Plan</th>
-</tr>
+            <tr>
+                <td>Setup fee</td>
+                <td>₹3,499 + GST</td>
+                <td>₹1,300 + GST</td>
+            </tr>
 
-<tr>
-    <td>Setup fee</td>
-    <td>₹3,499 + GST</td>
-    <td>₹1,300 + GST</td>
-</tr>
+            <tr>
+                <td>Total including GST</td>
+                <td><strong>₹4,128</strong></td>
+                <td><strong>₹1,528</strong></td>
+            </tr>
 
-<tr>
-    <td>Total including GST</td>
-    <td><strong>₹4,128</strong></td>
-    <td><strong>₹1,528</strong></td>
-</tr>
+            <tr>
+                <td>Rental</td>
+                <td>No rental</td>
+                <td>₹470 may apply*</td>
+            </tr>
 
-<tr>
-    <td>Rental</td>
-    <td>No rental</td>
-    <td>₹470 may apply*</td>
-</tr>
+            <tr>
+                <td>Rental waiver condition</td>
+                <td>Not applicable</td>
+                <td>₹2 lakh monthly transaction*</td>
+            </tr>
 
-<tr>
-    <td>Rental waiver condition</td>
-    <td>Not applicable</td>
-    <td>₹2 lakh monthly transaction*</td>
-</tr>
+            <tr>
+                <td>Paper roll</td>
+                <td>Lifetime benefit*</td>
+                <td>Lifetime benefit*</td>
+            </tr>
 
-<tr>
-    <td>Paper roll</td>
-    <td>Lifetime benefit*</td>
-    <td>Lifetime benefit*</td>
-</tr>
+            <tr>
+                <td>Grocery MDR</td>
+                <td>1.3%*</td>
+                <td>1.3%*</td>
+            </tr>
 
-<tr>
-    <td>Grocery MDR</td>
-    <td>1.3%*</td>
-    <td>1.3%*</td>
-</tr>
+            <tr>
+                <td>Non-grocery MDR</td>
+                <td>1.64%*</td>
+                <td>1.64%*</td>
+            </tr>
 
-<tr>
-    <td>Non-grocery MDR</td>
-    <td>1.64%*</td>
-    <td>1.64%*</td>
-</tr>
+        </table>
 
-</table>
-
-</div>
-""",
-    unsafe_allow_html=True
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
@@ -1191,88 +883,73 @@ st.divider()
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    💰 Monthly Plan Rental Calculator
-</div>
+    dedent("""
+    <div class="section-title">
+        💰 Monthly Plan Rental Calculator
+    </div>
 
-<div class="section-subtitle">
-    Check the stated ₹2 lakh monthly transaction condition.
-</div>
-""",
-    unsafe_allow_html=True
+    <div class="section-subtitle">
+        Check the stated ₹2 lakh monthly transaction condition.
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
 calc1, calc2 = st.columns(2)
 
-
 with calc1:
-
     transaction = st.number_input(
         "Estimated monthly transaction volume (₹)",
-
         min_value=0,
-
         max_value=10000000,
-
         value=200000,
-
         step=10000,
-
-        format="%d"
+        format="%d",
     )
 
-
 with calc2:
-
     st.markdown(
         '<div class="calculator">',
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     if transaction >= 200000:
-
         st.markdown(
-            """
+            dedent("""
             <div class="result-green">
 
                 ✅ ₹2 lakh threshold reached
 
                 <br><br>
 
-                The stated rental-waiver condition
-                may apply, subject to applicable
-                eligibility and terms.
+                The stated rental-waiver condition may apply,
+                subject to applicable eligibility and terms.
 
             </div>
-            """,
-            unsafe_allow_html=True
+            """),
+            unsafe_allow_html=True,
         )
-
     else:
-
         st.markdown(
-            """
+            dedent("""
             <div class="result-orange">
 
                 ⚠️ Below ₹2 lakh
 
                 <br><br>
 
-                ₹470 rental may apply under
-                the monthly plan.
+                ₹470 rental may apply under the monthly plan.
 
             </div>
-            """,
-            unsafe_allow_html=True
+            """),
+            unsafe_allow_html=True,
         )
 
     st.markdown(
         "</div>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-
 
 st.caption(
     "Indicative calculator only. Final billing and eligibility "
@@ -1288,21 +965,20 @@ st.divider()
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    🏪 Suitable for different businesses
-</div>
+    dedent("""
+    <div class="section-title">
+        🏪 Suitable for different businesses
+    </div>
 
-<div class="section-subtitle">
-    EDC enquiries from different merchant categories are welcome.
-</div>
-""",
-    unsafe_allow_html=True
+    <div class="section-subtitle">
+        EDC enquiries from different merchant categories are welcome.
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
 businesses = [
-
     "🛒 Grocery Stores",
     "🍴 Restaurants",
     "👕 Clothing Stores",
@@ -1310,18 +986,13 @@ businesses = [
     "💇 Salons",
     "📱 Mobile Stores",
     "🔧 Service Businesses",
-    "🏪 Retail Shops"
-
+    "🏪 Retail Shops",
 ]
-
 
 business_cols = st.columns(4)
 
-
 for i, business in enumerate(businesses):
-
     with business_cols[i % 4]:
-
         st.info(business)
 
 
@@ -1333,21 +1004,20 @@ st.divider()
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    📍 Merchant assistance across Chennai
-</div>
+    dedent("""
+    <div class="section-title">
+        📍 Merchant assistance across Chennai
+    </div>
 
-<div class="section-subtitle">
-    Enquiries can be raised from merchants in and around these areas.
-</div>
-""",
-    unsafe_allow_html=True
+    <div class="section-subtitle">
+        Enquiries can be raised from merchants in and around these areas.
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
 areas = [
-
     "Ashok Nagar",
     "KK Nagar",
     "T. Nagar",
@@ -1361,29 +1031,17 @@ areas = [
     "Velachery",
     "Vadapalani",
     "Anna Nagar",
-    "Tambaram"
-
+    "Tambaram",
 ]
 
-
-area_html = ""
-
-for area in areas:
-
-    area_html += (
-        f'<span class="area-pill">{area}</span>'
-    )
-
+area_html = "".join(
+    f'<span class="area-pill">{area}</span>'
+    for area in areas
+)
 
 st.markdown(
-    f"""
-    <div class="area-container">
-
-        {area_html}
-
-    </div>
-    """,
-    unsafe_allow_html=True
+    f'<div class="area-container">{area_html}</div>',
+    unsafe_allow_html=True,
 )
 
 
@@ -1395,16 +1053,16 @@ st.divider()
 # =========================================================
 
 st.markdown(
-    """
-<div class="section-title">
-    📲 Request EDC assistance
-</div>
+    dedent("""
+    <div class="section-title">
+        📲 Request EDC assistance
+    </div>
 
-<div class="section-subtitle">
-    Share your business details and continue through WhatsApp.
-</div>
-""",
-    unsafe_allow_html=True
+    <div class="section-subtitle">
+        Share your business details and continue through WhatsApp.
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
@@ -1412,9 +1070,8 @@ lead1, lead2 = st.columns([0.9, 1.1])
 
 
 with lead1:
-
     st.markdown(
-        """
+        dedent("""
         <div class="lead-info">
 
             <h2>
@@ -1422,9 +1079,8 @@ with lead1:
             </h2>
 
             <p>
-                Share a few details about your business
-                so the appropriate plan information
-                can be discussed with you.
+                Share a few details about your business so the
+                appropriate plan information can be discussed with you.
             </p>
 
             <br>
@@ -1446,8 +1102,8 @@ with lead1:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
 
 
@@ -1465,24 +1121,16 @@ with lead2:
 
         mobile = st.text_input(
             "Mobile Number *",
-            placeholder="Enter 10-digit mobile number"
+            placeholder="Enter 10-digit mobile number",
         )
 
         area = st.selectbox(
             "Business Area *",
-
-            [
-                "Select Area"
-            ]
-            + areas
-            + [
-                "Other Chennai Area"
-            ]
+            ["Select Area"] + areas + ["Other Chennai Area"],
         )
 
         business_type = st.selectbox(
             "Business Type",
-
             [
                 "Grocery",
                 "Restaurant",
@@ -1492,39 +1140,32 @@ with lead2:
                 "Mobile Store",
                 "Clothing Store",
                 "Service Business",
-                "Other"
-            ]
+                "Other",
+            ],
         )
 
         monthly_transaction = st.selectbox(
             "Approx. Monthly Transaction",
-
             [
                 "Below ₹50,000",
                 "₹50,000 – ₹1,00,000",
                 "₹1,00,000 – ₹2,00,000",
                 "₹2,00,000 – ₹5,00,000",
                 "Above ₹5,00,000",
-                "Not sure"
-            ]
+                "Not sure",
+            ],
         )
 
         preferred_plan = st.radio(
             "Preferred Plan",
-
-            [
-                "Annual",
-                "Monthly",
-                "Need guidance"
-            ],
-
-            horizontal=True
+            ["Annual", "Monthly", "Need guidance"],
+            horizontal=True,
         )
 
         submitted = st.form_submit_button(
             "🚀 REQUEST EDC ASSISTANCE",
             type="primary",
-            use_container_width=True
+            use_container_width=True,
         )
 
 
@@ -1537,37 +1178,20 @@ if submitted:
     clean_mobile = re.sub(
         r"\D",
         "",
-        mobile
+        mobile,
     )
 
-
     if not name.strip():
-
-        st.error(
-            "Please enter your name."
-        )
-
+        st.error("Please enter your name.")
 
     elif not business_name.strip():
-
-        st.error(
-            "Please enter your business name."
-        )
-
+        st.error("Please enter your business name.")
 
     elif len(clean_mobile) != 10:
-
-        st.error(
-            "Please enter a valid 10-digit Indian mobile number."
-        )
-
+        st.error("Please enter a valid 10-digit Indian mobile number.")
 
     elif area == "Select Area":
-
-        st.error(
-            "Please select your business area."
-        )
-
+        st.error("Please select your business area.")
 
     else:
 
@@ -1585,25 +1209,19 @@ Preferred Plan: {preferred_plan}
 Please share the details.
 """.strip()
 
-
         whatsapp_url = (
-
             f"https://wa.me/{WHATSAPP_NUMBER}"
-
             f"?text={urllib.parse.quote(lead_message)}"
-
         )
-
 
         st.success(
             "✅ Enquiry prepared successfully!"
         )
 
-
         st.link_button(
             "💬 SEND DETAILS ON WHATSAPP",
             whatsapp_url,
-            use_container_width=True
+            use_container_width=True,
         )
 
 
@@ -1613,65 +1231,53 @@ Please share the details.
 
 st.divider()
 
-
 st.markdown(
-    """
-<div class="section-title">
-    Frequently asked questions
-</div>
-""",
-    unsafe_allow_html=True
+    dedent("""
+    <div class="section-title">
+        Frequently asked questions
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
 
 
 faqs = [
-
     (
         "What is an EDC machine?",
-
         "An EDC/payment terminal is a device used by businesses "
         "to accept eligible electronic/card payments."
     ),
-
     (
         "Which plan should I choose?",
-
         "The annual plan has the stated no-rental structure. "
         "The monthly plan has a lower upfront fee, with the "
         "stated rental-waiver condition linked to the monthly "
         "transaction threshold."
     ),
-
     (
         "Is the ₹2 lakh condition for the annual plan?",
-
-        "Based on the commercial details provided for this page, "
+        "Based on the commercial details supplied for this page, "
         "the ₹2 lakh transaction condition is associated with "
         "the monthly plan's rental-waiver condition."
     ),
-
     (
         "Are paper rolls free?",
-
         "The stated benefit is lifetime paper roll free, "
         "subject to applicable merchant terms."
     ),
-
     (
         "Are the MDR rates final?",
-
         "The rates displayed are the supplied grocery and "
         "non-grocery rates. Final applicable pricing should "
         "be confirmed during merchant onboarding."
-    )
-
+    ),
 ]
 
 
 for question, answer in faqs:
 
     st.markdown(
-        f"""
+        dedent(f"""
         <div class="faq">
 
             <div class="faq-question">
@@ -1683,8 +1289,8 @@ for question, answer in faqs:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """),
+        unsafe_allow_html=True,
     )
 
 
@@ -1694,62 +1300,53 @@ for question, answer in faqs:
 
 st.divider()
 
-
 final_message = (
     "Hi, I want to know more about the EDC machine "
     "plans for my business in Chennai."
 )
 
-
 final_whatsapp = (
-
     f"https://wa.me/{WHATSAPP_NUMBER}"
-
     f"?text={urllib.parse.quote(final_message)}"
-
 )
 
 
 st.markdown(
-    """
-<div class="hero">
+    dedent("""
+    <div class="hero">
 
-    <div class="hero-badge">
-        READY TO ENQUIRE?
+        <div class="hero-badge">
+            READY TO ENQUIRE?
+        </div>
+
+        <div class="hero-title" style="font-size:38px;">
+            Get EDC assistance for your business
+        </div>
+
+        <div class="hero-text">
+            Contact us through WhatsApp or call for assistance.
+        </div>
+
     </div>
-
-    <h1 style="font-size:38px;">
-        Get EDC assistance for your business
-    </h1>
-
-    <p>
-        Contact us through WhatsApp or call for assistance.
-    </p>
-
-</div>
-""",
-    unsafe_allow_html=True
+    """),
+    unsafe_allow_html=True,
 )
 
 
 final1, final2 = st.columns(2)
 
-
 with final1:
-
     st.link_button(
         "💬 WHATSAPP NOW",
         final_whatsapp,
-        use_container_width=True
+        use_container_width=True,
     )
 
-
 with final2:
-
     st.link_button(
         "📞 CALL NOW",
         f"tel:{CALL_NUMBER}",
-        use_container_width=True
+        use_container_width=True,
     )
 
 
@@ -1758,131 +1355,22 @@ with final2:
 # =========================================================
 
 st.markdown(
-    """
-<div class="footer">
+    dedent("""
+    <div class="footer">
 
-    EDC merchant assistance page for Chennai enquiries.
+        EDC merchant assistance page for Chennai enquiries.
 
-    <br><br>
+        <br><br>
 
-    Pricing, MDR, rental, paper-roll benefits,
-    eligibility and other commercial terms are subject
-    to applicable terms, eligibility and merchant agreement.
+        Pricing, MDR, rental, paper-roll benefits, eligibility
+        and other commercial terms are subject to applicable
+        terms, eligibility and merchant agreement.
 
-    <br>
+        <br>
 
-    Please verify final commercial terms before activation.
+        Please verify final commercial terms before activation.
 
-</div>
-""",
-    unsafe_allow_html=True
-)
-
-
-# =========================================================
-# MOBILE STICKY BUTTON
-# =========================================================
-
-sticky_message = (
-    "Hi, I am interested in an EDC machine "
-    "for my business in Chennai. Please share the details."
-)
-
-
-sticky_whatsapp = (
-
-    f"https://wa.me/{WHATSAPP_NUMBER}"
-
-    f"?text={urllib.parse.quote(sticky_message)}"
-
-)
-
-
-st.markdown(
-    f"""
-<style>
-
-.mobile-bottom-bar {{
-
-    position: fixed;
-
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-
-    z-index: 99999;
-
-    display: flex;
-
-    gap: 8px;
-
-    padding: 8px;
-
-    background: rgba(255,255,255,0.97);
-
-    border: 1px solid #E5E7EB;
-
-    border-radius: 15px;
-
-    box-shadow:
-        0 10px 35px rgba(0,0,0,0.15);
-
-}}
-
-.mobile-bottom-bar a {{
-
-    flex: 1;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    font-weight: 800;
-
-    font-size: 14px;
-
-}}
-
-.whatsapp-button {{
-
-    background: #16A34A;
-
-    color: #FFFFFF !important;
-
-}}
-
-.call-button {{
-
-    background: #4F46E5;
-
-    color: #FFFFFF !important;
-
-}}
-
-</style>
-
-<div class="mobile-bottom-bar">
-
-    <a
-        class="whatsapp-button"
-        href="{sticky_whatsapp}"
-        target="_blank"
-    >
-        💬 WhatsApp
-    </a>
-
-    <a
-        class="call-button"
-        href="tel:{CALL_NUMBER}"
-    >
-        📞 Call
-    </a>
-
-</div>
-""",
-    unsafe_allow_html=True
+    </div>
+    """),
+    unsafe_allow_html=True,
 )
