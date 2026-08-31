@@ -5,11 +5,11 @@ import requests
 
 
 # =========================================================
-# PAGE CONFIG
+# PAGE CONFIGURATION
 # =========================================================
 
 st.set_page_config(
-    page_title="EDC Payment Machine Chennai | Merchant Assistance",
+    page_title="EDC Payment Machine Chennai",
     page_icon="💳",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -17,7 +17,7 @@ st.set_page_config(
 
 
 # =========================================================
-# SETTINGS
+# CONFIGURATION
 # =========================================================
 
 WHATSAPP_NUMBER = "917448326548"
@@ -28,45 +28,24 @@ MONTHLY_RENTAL = 470
 
 
 # =========================================================
-# TELEGRAM SETTINGS
+# TELEGRAM CONFIGURATION
 # =========================================================
-#
-# IMPORTANT:
-# Do NOT put your Telegram Bot Token directly in this file.
-#
-# Add these in Streamlit Cloud:
-#
-# TELEGRAM_BOT_TOKEN = "your_bot_token"
-# TELEGRAM_CHAT_ID = "your_chat_id"
-#
-# =========================================================
-
 
 def get_telegram_credentials():
 
     try:
+        bot_token = st.secrets["TELEGRAM_BOT_TOKEN"]
+        chat_id = st.secrets["TELEGRAM_CHAT_ID"]
 
-        bot_token = st.secrets.get(
-            "TELEGRAM_BOT_TOKEN",
-            ""
-        )
-
-        chat_id = st.secrets.get(
-            "TELEGRAM_CHAT_ID",
-            ""
-        )
-
-        return bot_token, chat_id
+        return str(bot_token), str(chat_id)
 
     except Exception:
-
         return "", ""
 
 
 # =========================================================
-# SEND LEAD TO TELEGRAM
+# TELEGRAM MESSAGE FUNCTION
 # =========================================================
-
 
 def send_telegram_message(message):
 
@@ -74,9 +53,9 @@ def send_telegram_message(message):
 
     if not bot_token or not chat_id:
 
-        return False, (
-            "Telegram credentials are not configured "
-            "in Streamlit Secrets."
+        return (
+            False,
+            "Telegram credentials are missing in Streamlit Secrets."
         )
 
     telegram_url = (
@@ -85,13 +64,8 @@ def send_telegram_message(message):
     )
 
     payload = {
-
         "chat_id": chat_id,
-
-        "text": message,
-
-        "parse_mode": "HTML"
-
+        "text": message
     }
 
     try:
@@ -108,110 +82,47 @@ def send_telegram_message(message):
 
         else:
 
-            return False, (
-                f"Telegram API error: "
-                f"{response.status_code}"
+            try:
+                error_data = response.json()
+                error_message = error_data.get(
+                    "description",
+                    "Unknown Telegram error"
+                )
+            except Exception:
+                error_message = response.text
+
+            return (
+                False,
+                f"Telegram error: {error_message}"
             )
+
+    except requests.exceptions.Timeout:
+
+        return (
+            False,
+            "Telegram request timed out."
+        )
 
     except requests.exceptions.RequestException as error:
 
-        return False, (
+        return (
+            False,
             f"Telegram connection failed: {error}"
         )
 
 
 # =========================================================
-# PAGE STYLING
-# =========================================================
-#
-# This CSS is only for appearance.
-# There is NO HTML content used for cards/buttons/tables.
-#
+# SESSION STATE
 # =========================================================
 
+if "show_lead_form" not in st.session_state:
 
-st.markdown(
-    """
-    <style>
-
-    .stApp {
-        background-color: #F5F7FB;
-    }
-
-    .block-container {
-        max-width: 1180px;
-        padding-top: 25px;
-        padding-bottom: 100px;
-    }
-
-    h1, h2, h3, h4 {
-        color: #111827 !important;
-    }
-
-    p {
-        color: #374151;
-    }
-
-    [data-testid="stMetric"] {
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 16px;
-        padding: 18px;
-        box-shadow: 0 5px 18px rgba(0,0,0,0.05);
-    }
-
-    [data-testid="stMetricLabel"] {
-        color: #6B7280 !important;
-    }
-
-    [data-testid="stMetricValue"] {
-        color: #111827 !important;
-    }
-
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 18px !important;
-        border-color: #E5E7EB !important;
-        background-color: #FFFFFF !important;
-        box-shadow: 0 6px 22px rgba(0,0,0,0.05);
-    }
-
-    [data-testid="stForm"] {
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 18px;
-        padding: 25px;
-    }
-
-    div.stButton > button {
-        min-height: 48px;
-        border-radius: 12px;
-        font-weight: 800;
-    }
-
-    div.stButton > button:hover {
-        transform: translateY(-1px);
-    }
-
-    @media (max-width: 700px) {
-
-        .block-container {
-            padding-left: 12px;
-            padding-right: 12px;
-            padding-bottom: 90px;
-        }
-
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+    st.session_state["show_lead_form"] = False
 
 
 # =========================================================
 # HEADER
 # =========================================================
-
 
 header_left, header_right = st.columns(
     [2.5, 1]
@@ -241,16 +152,15 @@ st.divider()
 # HERO SECTION
 # =========================================================
 
-
-st.markdown(
-    "# Get an EDC Payment Machine for Your Business"
+st.header(
+    "Get an EDC Payment Machine for Your Business"
 )
 
 
-st.markdown(
+st.write(
     """
-    Explore EDC plan options for your business
-    and request assistance from a merchant representative
+    Explore EDC plan options for your business and
+    request assistance from a merchant representative
     across Chennai.
     """
 )
@@ -261,31 +171,28 @@ st.caption(
 )
 
 
-hero1, hero2 = st.columns(2)
+hero_left, hero_right = st.columns(2)
 
 
-with hero1:
+with hero_left:
 
     get_machine_clicked = st.button(
         "🚀 GET EDC MACHINE",
-        type="primary",
         use_container_width=True
     )
 
 
-with hero2:
+with hero_right:
 
     quick_message = (
         "Hi, I am interested in getting an EDC machine "
         "for my business in Chennai. Please share the details."
     )
 
-
     quick_whatsapp_url = (
         f"https://wa.me/{WHATSAPP_NUMBER}"
         f"?text={urllib.parse.quote(quick_message)}"
     )
-
 
     st.link_button(
         "💬 WHATSAPP ENQUIRY",
@@ -295,17 +202,15 @@ with hero2:
 
 
 # =========================================================
-# GET EDC BUTTON RESPONSE
+# GET EDC MACHINE BUTTON
 # =========================================================
-
 
 if get_machine_clicked:
 
     st.session_state["show_lead_form"] = True
 
     st.success(
-        "👇 Please fill in your business details "
-        "in the enquiry form below."
+        "👇 Please fill in your business details below."
     )
 
 
@@ -316,8 +221,7 @@ st.divider()
 # QUICK PLAN OVERVIEW
 # =========================================================
 
-
-st.subheader(
+st.header(
     "Quick Plan Overview"
 )
 
@@ -346,9 +250,9 @@ with price2:
 with price3:
 
     st.metric(
-        label="Monthly Transaction Condition",
+        label="Transaction Condition",
         value="₹2 Lakh",
-        delta="For stated rental waiver"
+        delta="Monthly rental waiver"
     )
 
 
@@ -358,7 +262,6 @@ st.divider()
 # =========================================================
 # WHY EDC
 # =========================================================
-
 
 st.header(
     "Why Businesses Choose an EDC Machine"
@@ -437,9 +340,8 @@ st.divider()
 
 
 # =========================================================
-# PLAN SECTION
+# PLANS
 # =========================================================
-
 
 st.header(
     "Choose Your Plan"
@@ -447,7 +349,7 @@ st.header(
 
 
 st.write(
-    "Compare the two available EDC plan structures."
+    "Compare the available EDC plan structures."
 )
 
 
@@ -457,7 +359,6 @@ annual_col, monthly_col = st.columns(2)
 # =========================================================
 # ANNUAL PLAN
 # =========================================================
-
 
 with annual_col:
 
@@ -472,7 +373,7 @@ with annual_col:
         )
 
         st.caption(
-            "₹3,499 + GST • Total including GST"
+            "Setup Fee: ₹3,499 + GST"
         )
 
         st.divider()
@@ -497,8 +398,6 @@ with annual_col:
             "✔ Non-grocery MDR: 1.64%*"
         )
 
-        st.divider()
-
         st.caption(
             """
             *Subject to applicable eligibility,
@@ -510,7 +409,6 @@ with annual_col:
 # =========================================================
 # MONTHLY PLAN
 # =========================================================
-
 
 with monthly_col:
 
@@ -525,7 +423,7 @@ with monthly_col:
         )
 
         st.caption(
-            "₹1,300 + GST • Total including GST"
+            "Setup Fee: ₹1,300 + GST"
         )
 
         st.divider()
@@ -539,10 +437,8 @@ with monthly_col:
         )
 
         st.write(
-            """
-            ✔ ₹2 lakh monthly transaction target
-            for the stated rental-waiver condition*
-            """
+            "✔ ₹2 lakh monthly transaction target "
+            "for stated rental waiver*"
         )
 
         st.write(
@@ -556,8 +452,6 @@ with monthly_col:
         st.write(
             "✔ Non-grocery MDR: 1.64%*"
         )
-
-        st.divider()
 
         st.caption(
             """
@@ -574,14 +468,8 @@ st.divider()
 # PLAN COMPARISON
 # =========================================================
 
-
 st.header(
     "Annual vs Monthly"
-)
-
-
-st.write(
-    "Quick comparison of the key plan details."
 )
 
 
@@ -590,17 +478,11 @@ comparison_data = {
     "Feature": [
 
         "Setup Fee",
-
         "Total Including GST",
-
         "Rental",
-
         "Rental Waiver Condition",
-
         "Paper Roll",
-
         "Grocery MDR",
-
         "Non-Grocery MDR"
 
     ],
@@ -608,17 +490,11 @@ comparison_data = {
     "Annual Plan": [
 
         "₹3,499 + GST",
-
         "₹4,128",
-
         "No Rental",
-
         "Not Applicable",
-
         "Lifetime Benefit*",
-
         "1.3%*",
-
         "1.64%*"
 
     ],
@@ -626,21 +502,14 @@ comparison_data = {
     "Monthly Plan": [
 
         "₹1,300 + GST",
-
         "₹1,528",
-
         "₹470 may apply*",
-
         "₹2 lakh monthly transaction*",
-
         "Lifetime Benefit*",
-
         "1.3%*",
-
         "1.64%*"
 
     ]
-
 }
 
 
@@ -664,15 +533,13 @@ st.divider()
 # RENTAL CALCULATOR
 # =========================================================
 
-
 st.header(
     "💰 Monthly Plan Rental Calculator"
 )
 
 
 st.write(
-    "Check whether your estimated monthly transaction "
-    "volume reaches the stated ₹2 lakh threshold."
+    "Check your estimated monthly transaction volume."
 )
 
 
@@ -705,26 +572,23 @@ with calculator_right:
         if transaction >= RENTAL_THRESHOLD:
 
             st.success(
-
                 """
                 ✅ ₹2 lakh threshold reached.
 
                 The stated rental-waiver condition may apply,
                 subject to applicable eligibility and terms.
                 """
-
             )
 
         else:
 
             st.warning(
-
-                """
+                f"""
                 ⚠️ Below ₹2 lakh.
 
-                ₹470 rental may apply under the monthly plan.
+                ₹{MONTHLY_RENTAL} rental may apply
+                under the monthly plan.
                 """
-
             )
 
 
@@ -741,7 +605,6 @@ st.divider()
 # BUSINESS TYPES
 # =========================================================
 
-
 st.header(
     "🏪 Suitable for Different Businesses"
 )
@@ -755,19 +618,12 @@ st.write(
 businesses = [
 
     "🛒 Grocery Stores",
-
     "🍴 Restaurants",
-
     "👕 Clothing Stores",
-
     "💊 Pharmacies",
-
     "💇 Salons",
-
     "📱 Mobile Stores",
-
     "🔧 Service Businesses",
-
     "🏪 Retail Shops"
 
 ]
@@ -791,7 +647,6 @@ st.divider()
 # =========================================================
 # CHENNAI AREAS
 # =========================================================
-
 
 st.header(
     "📍 Merchant Assistance Across Chennai"
@@ -839,9 +694,8 @@ st.divider()
 
 
 # =========================================================
-# LEAD SECTION
+# LEAD FORM
 # =========================================================
-
 
 st.header(
     "📲 Request EDC Assistance"
@@ -849,8 +703,10 @@ st.header(
 
 
 st.write(
-    "Fill in your business details. "
-    "Your enquiry will be sent directly to the Telegram lead system."
+    """
+    Fill in your business details.
+    Your enquiry will be sent directly to the sales lead system.
+    """
 )
 
 
@@ -862,7 +718,6 @@ lead_left, lead_right = st.columns(
 # =========================================================
 # LEFT INFORMATION
 # =========================================================
-
 
 with lead_left:
 
@@ -897,9 +752,8 @@ with lead_left:
 
 
 # =========================================================
-# LEAD FORM
+# FORM
 # =========================================================
-
 
 with lead_right:
 
@@ -1013,17 +867,14 @@ with lead_right:
 
             "🚀 REQUEST EDC ASSISTANCE",
 
-            type="primary",
-
             use_container_width=True
 
         )
 
 
 # =========================================================
-# PROCESS LEAD
+# FORM SUBMISSION
 # =========================================================
-
 
 if submitted:
 
@@ -1034,9 +885,9 @@ if submitted:
     )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # VALIDATION
-    # -----------------------------------------------------
+    # =====================================================
 
     if not name.strip():
 
@@ -1068,18 +919,21 @@ if submitted:
 
     else:
 
-        # -------------------------------------------------
+        # =================================================
         # RENTAL STATUS
-        # -------------------------------------------------
+        # =================================================
 
         if monthly_transaction in [
+
             "₹2,00,000 – ₹5,00,000",
+
             "Above ₹5,00,000"
+
         ]:
 
             rental_status = (
-                "₹2 lakh+ transaction range "
-                "— stated rental-waiver condition may apply"
+                "₹2 lakh+ transaction range - "
+                "stated rental-waiver condition may apply"
             )
 
         elif monthly_transaction == "Not sure":
@@ -1095,22 +949,29 @@ if submitted:
             )
 
 
-        # -------------------------------------------------
-        # TELEGRAM MESSAGE
-        # -------------------------------------------------
+        # =================================================
+        # CREATE TELEGRAM MESSAGE
+        # =================================================
 
         telegram_message = f"""
 🔥 NEW EDC LEAD
 
-👤 Name: {name}
-🏪 Business: {business_name}
-📞 Mobile: {mobile}
-📍 Area: {area}
+👤 Name:
+{name}
+
+🏪 Business:
+{business_name}
+
+📞 Mobile:
+{mobile}
+
+📍 Area:
+{area}
 
 🛒 Business Type:
 {business_type}
 
-💰 Approx Monthly Transaction:
+💰 Approx. Monthly Transaction:
 {monthly_transaction}
 
 📋 Preferred Plan:
@@ -1124,20 +985,29 @@ Chennai EDC Website
 """.strip()
 
 
-        # -------------------------------------------------
-        # SEND TO TELEGRAM
-        # -------------------------------------------------
+        # =================================================
+        # SEND TELEGRAM
+        # =================================================
 
-        success, telegram_result = send_telegram_message(
-            telegram_message
+        telegram_success, telegram_message_result = (
+            send_telegram_message(
+                telegram_message
+            )
         )
 
 
-        if success:
+        # =================================================
+        # SUCCESS
+        # =================================================
+
+        if telegram_success:
 
             st.success(
-                "✅ Enquiry submitted successfully! "
-                "Your details have been sent."
+                "✅ Enquiry submitted successfully!"
+            )
+
+            st.info(
+                "Your enquiry has been sent to the sales team."
             )
 
 
@@ -1146,10 +1016,17 @@ Chennai EDC Website
             # ---------------------------------------------
 
             whatsapp_message = (
+
                 f"Hi, I am {name}. "
-                f"I submitted an EDC enquiry for "
-                f"{business_name}. "
-                f"My preferred plan is {preferred_plan}."
+
+                f"I submitted an EDC enquiry "
+
+                f"for {business_name}. "
+
+                f"My preferred plan is {preferred_plan}. "
+
+                f"Area: {area}."
+
             )
 
 
@@ -1173,29 +1050,39 @@ Chennai EDC Website
             )
 
 
+        # =================================================
+        # TELEGRAM FAILED
+        # =================================================
+
         else:
 
             st.error(
-                "⚠️ We could not submit the enquiry "
-                "to the lead system."
+                "⚠️ Telegram submission failed."
             )
 
-
             st.warning(
-                telegram_result
+                telegram_message_result
             )
 
 
             # ---------------------------------------------
-            # FALLBACK WHATSAPP
+            # WHATSAPP FALLBACK
             # ---------------------------------------------
 
             fallback_message = (
+
                 f"Hi, I am {name}. "
+
                 f"I am interested in an EDC machine. "
+
                 f"Business: {business_name}. "
+
                 f"Area: {area}. "
+
+                f"Business Type: {business_type}. "
+
                 f"Preferred Plan: {preferred_plan}."
+
             )
 
 
@@ -1225,7 +1112,6 @@ st.divider()
 # =========================================================
 # FAQ
 # =========================================================
-
 
 st.header(
     "Frequently Asked Questions"
@@ -1303,7 +1189,6 @@ st.divider()
 # FINAL CTA
 # =========================================================
 
-
 st.header(
     "🚀 Ready to Enquire?"
 )
@@ -1364,7 +1249,6 @@ st.divider()
 # =========================================================
 # FOOTER
 # =========================================================
-
 
 st.caption(
     """
